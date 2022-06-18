@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.1.1](https://github.com/syneki/terraform-kubernetes-rbac/compare/v1.1.0...v1.1.1) (2022-06-18)
+
+
+### Bug Fixes
+
+* Fix for_each resources ([4b45d11](https://github.com/syneki/terraform-kubernetes-rbac/commit/4b45d119996e60659c29ce6d6ca420381ae6fe9e))
+* Remove unused aws provider from version ([b3908cb](https://github.com/syneki/terraform-kubernetes-rbac/commit/b3908cbc468beaddbb51a1a62d80f9e59db00ebe))
+
 ## [1.1.0](https://github.com/Syneki/terraform-k8s-rbac/compare/v1.0.0...v1.1.0) (2022-06-18)
 
 
