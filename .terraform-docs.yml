@@ -14,14 +14,16 @@ sections:
   show: []
 
 content: |-
-  # Terraform Kubernetes RBAC Module
+  # Terraform Kubernetes Elastic Agent
 
-  Terraform module which create Kubernetes Service Account with RBAC Authorization.
+  Terraform module which create Elastic Agent, this module is perfect if you want to run a Fleet server or run an Elastic Agent on Fleet.
 
   ## Usage
 
+  ### Fleet Server
+
   ```hcl
-  {{ include "example/main.tf" }}
+  {{ include "examples/fleet-server/main.tf" }}
   ```
 
   {{ .Requirements }}

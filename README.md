@@ -1,83 +1,24 @@
 <!-- BEGIN_TF_DOCS -->
-# Terraform Kubernetes RBAC Module
+# Terraform Kubernetes Elastic Agent
 
-Terraform module which create Kubernetes Service Account with RBAC Authorization.
+Terraform module which create Elastic Agent, this module is perfect if you want to run a Fleet server or run an Elastic Agent on Fleet.
 
 ## Usage
 
+### Fleet Server
+
 ```hcl
-module "rbac_example" {
-  source = "../"
+module "fleet_server" {
+  source = "../.."
 
-  name = "rbac-example"
+  name      = "fleet-server"
+  namespace = "monitoring"
 
-  cluster_role = {
-    rules = [
-      {
-        api_groups = [""]
-        resources  = ["nodes", "namespaces", "events", "pods", "services", "configmaps", "serviceaccounts", "peristentvolumes", "persistentvolumeclaims"]
-        verbs      = ["get", "list", "watch"]
-      },
-      {
-        api_groups = ["extensions"]
-        resources  = ["replicasets"]
-        verbs      = ["get", "list", "watch"]
-
-      },
-      {
-        api_groups = ["apps"]
-        resources  = ["statefulsets", "deployments", "replicasets", "daemonsets"]
-      verbs = ["get", "list", "watch"] },
-      {
-        api_groups = [""]
-        resources  = ["nodes/stats"]
-        verbs      = ["get"]
-      },
-      {
-        api_groups = ["batch"]
-        resources  = ["jobs", "cronjobs"]
-        verbs      = ["get", "list", "watch"]
-      },
-      {
-        non_resource_urls = ["/metrics"]
-        verbs             = ["get"]
-      },
-      {
-        api_groups = ["rbac.authorization.k8s.io"]
-        resources  = ["clusterrolebindings", "clusterroles", "rolebindings", "roles"]
-        verbs      = ["get", "list", "watch"]
-      },
-      {
-        api_groups = ["policy"]
-        resources  = ["podsecuritypolicies"]
-        verbs      = ["get", "list", "watch"]
-      }
-    ]
-  }
-
-  roles = [
-    {
-      name = "kubeadm-config" # The name will be rbac-example-kubeadm-config
-      rules = [
-        {
-          api_groups     = [""]
-          resources      = ["configmaps"]
-          resource_names = ["kubeadm-config"]
-          verbs          = ["get"]
-        },
-      ]
-    },
-    {
-      name = "kubeadm-config" # The name will be rbac-example-kubeadm-config
-      rules = [
-        {
-          api_groups = ["coordination.k8s.io"]
-          resources  = ["leases"]
-          verbs      = ["get", "create", "update"]
-        },
-      ]
-    }
-  ]
+  fleet_server_enable             = true
+  fleet_server_elasticsearch_host = "https://elasticsearch:9200"
+  fleet_server_service_token      = "my-service-token"
+  fleet_server_policy_id          = "fleet-server-policy"
+  fleet_server_elasticsearch_ca   = "elasticsearch-coordinating-crt"
 }
 ```
 
@@ -96,32 +37,56 @@ module "rbac_example" {
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_rbac"></a> [rbac](#module\_rbac) | ../terraform-k8s-rbac | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [kubernetes_cluster_role.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role) | resource |
-| [kubernetes_cluster_role_binding.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_binding) | resource |
-| [kubernetes_role.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
-| [kubernetes_role_binding.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
-| [kubernetes_service_account.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
+| [kubernetes_daemonset.elastic_agent](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/daemonset) | resource |
+| [kubernetes_secret.elastic_agent](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cluster_role"></a> [cluster\_role](#input\_cluster\_role) | Configuration for the Cluster Role | <pre>object({<br>    rules = set(map(list(string)))<br>  })</pre> | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | Labels append to created resources | `map(string)` | `{}` | no |
+| <a name="input_elasticsearch_ca"></a> [elasticsearch\_ca](#input\_elasticsearch\_ca) | The path to a certificate authority. | `string` | `null` | no |
+| <a name="input_elasticsearch_host"></a> [elasticsearch\_host](#input\_elasticsearch\_host) | The Elasticsearch host to communicate with | `string` | `"http://elasticsearch:9200"` | no |
+| <a name="input_elasticsearch_password"></a> [elasticsearch\_password](#input\_elasticsearch\_password) | The basic authentication password used to connect to Kibana and retrieve a service\_token for Fleet. | `string` | `"changeme"` | no |
+| <a name="input_elasticsearch_username"></a> [elasticsearch\_username](#input\_elasticsearch\_username) | basic authentication username used to connect to Kibana and retrieve a service\_token for Fleet. | `string` | `"elastic"` | no |
+| <a name="input_fleet_ca"></a> [fleet\_ca](#input\_fleet\_ca) | The path to a certificate authority. Overrides ELASTICSEARCH\_CA when set. | `string` | `null` | no |
+| <a name="input_fleet_enroll"></a> [fleet\_enroll](#input\_fleet\_enroll) | Set to 1 to enroll the Elastic Agent into Fleet Server. | `bool` | `false` | no |
+| <a name="input_fleet_enrollment_token"></a> [fleet\_enrollment\_token](#input\_fleet\_enrollment\_token) | The token to use for enrollment. | `string` | `""` | no |
+| <a name="input_fleet_insecure"></a> [fleet\_insecure](#input\_fleet\_insecure) | When true, Elastic Agent communicates with Fleet Server over insecure or unverified HTTP. Setting this to true is not recommended. | `bool` | `false` | no |
+| <a name="input_fleet_server_cert"></a> [fleet\_server\_cert](#input\_fleet\_server\_cert) | The path to the certificate to use for HTTPS. | `string` | `null` | no |
+| <a name="input_fleet_server_elasticsearch_ca"></a> [fleet\_server\_elasticsearch\_ca](#input\_fleet\_server\_elasticsearch\_ca) | The path to a certificate authority. Overrides ELASTICSEARCH\_CA when set. | `string` | `null` | no |
+| <a name="input_fleet_server_elasticsearch_host"></a> [fleet\_server\_elasticsearch\_host](#input\_fleet\_server\_elasticsearch\_host) | The Elasticsearch host for Fleet Server to communicate with. Overrides ELASTICSEARCH\_HOST when set. | `string` | `null` | no |
+| <a name="input_fleet_server_enable"></a> [fleet\_server\_enable](#input\_fleet\_server\_enable) | Set to 1 to bootstrap Fleet Server on this Elastic Agent. When set to 1, this automatically forces Fleet enrollment as well. | `bool` | `false` | no |
+| <a name="input_fleet_server_host"></a> [fleet\_server\_host](#input\_fleet\_server\_host) | The binding host for Fleet Server HTTP. Overrides the host defined in the policy. | `string` | `null` | no |
+| <a name="input_fleet_server_insecure_http"></a> [fleet\_server\_insecure\_http](#input\_fleet\_server\_insecure\_http) | When true, exposes Fleet Server over HTTP (insecure). Setting this to true is not recommended. | `bool` | `false` | no |
+| <a name="input_fleet_server_policy_id"></a> [fleet\_server\_policy\_id](#input\_fleet\_server\_policy\_id) | The policy ID for Fleet Server to use on itself. | `string` | `null` | no |
+| <a name="input_fleet_server_policy_name"></a> [fleet\_server\_policy\_name](#input\_fleet\_server\_policy\_name) | The name of the policy for Fleet Server to use on itself. Overrides FLEET\_TOKEN\_POLICY\_NAME when set. | `string` | `null` | no |
+| <a name="input_fleet_server_port"></a> [fleet\_server\_port](#input\_fleet\_server\_port) | The binding port for Fleet Server HTTP. Overrides the port defined in the policy. | `string` | `null` | no |
+| <a name="input_fleet_server_service_token"></a> [fleet\_server\_service\_token](#input\_fleet\_server\_service\_token) | Service token to use for communication with Elasticsearch. | `string` | `null` | no |
+| <a name="input_fleet_token_name"></a> [fleet\_token\_name](#input\_fleet\_token\_name) | The token name to use to fetch the token from Kibana. | `string` | `null` | no |
+| <a name="input_fleet_token_policy_name"></a> [fleet\_token\_policy\_name](#input\_fleet\_token\_policy\_name) | The token policy name to use to fetch the token from Kibana. | `string` | `null` | no |
+| <a name="input_fleet_url"></a> [fleet\_url](#input\_fleet\_url) | URL to enroll the Fleet Server into. | `string` | `""` | no |
+| <a name="input_kibana_ca"></a> [kibana\_ca](#input\_kibana\_ca) | The path to a certificate authority. | `string` | `null` | no |
+| <a name="input_kibana_fleet_ca"></a> [kibana\_fleet\_ca](#input\_kibana\_fleet\_ca) | The path to a certificate authority. Overrides KIBANA\_CA when set. | `string` | `null` | no |
+| <a name="input_kibana_fleet_host"></a> [kibana\_fleet\_host](#input\_kibana\_fleet\_host) | The Kibana host to enable Fleet on. Overrides FLEET\_HOST when set. | `string` | `null` | no |
+| <a name="input_kibana_fleet_password"></a> [kibana\_fleet\_password](#input\_kibana\_fleet\_password) | The basic authentication password used to connect to Kibana and retrieve a service\_token to enable Fleet. Overrides ELASTICSEARCH\_PASSWORD when set. | `string` | `null` | no |
+| <a name="input_kibana_fleet_setup"></a> [kibana\_fleet\_setup](#input\_kibana\_fleet\_setup) | Enabling Fleet is required before Fleet Server will start. When this action is not performed, a user must manually log in to Kibana and visit the Fleet page to enable setup. | `bool` | `false` | no |
+| <a name="input_kibana_fleet_username"></a> [kibana\_fleet\_username](#input\_kibana\_fleet\_username) | The basic authentication username used to connect to Kibana and retrieve a service\_token to enable Fleet. Overrides ELASTICSEARCH\_USERNAME when set. | `string` | `null` | no |
+| <a name="input_kibana_host"></a> [kibana\_host](#input\_kibana\_host) | The Kibana host. | `string` | `"http://kibana:5601"` | no |
+| <a name="input_kibana_password"></a> [kibana\_password](#input\_kibana\_password) | The basic authentication password used to connect to Kibana to retrieve a service\_token. | `string` | `"changeme"` | no |
+| <a name="input_kibana_username"></a> [kibana\_username](#input\_kibana\_username) | The basic authentication username used to connect to Kibana to retrieve a service\_token. | `string` | `"elastic"` | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | Labels append to resources created | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name used to create resources | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where resources will be created | `string` | `"default"` | no |
-| <a name="input_roles"></a> [roles](#input\_roles) | Configuration for the Roles | <pre>list(object({<br>    name  = string<br>    rules = set(map(list(string)))<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_roles"></a> [roles](#output\_roles) | The created Roles name |
-| <a name="output_service_account"></a> [service\_account](#output\_service\_account) | The created ServiceAccount name |
+No outputs.
 <!-- END_TF_DOCS -->
