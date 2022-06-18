@@ -56,9 +56,9 @@ resource "kubernetes_role" "this" {
     for_each = each.value.rules
 
     content {
-      api_groups = each.value.api_groups
-      resources  = each.value.resources
-      verbs      = each.value.verbs
+      api_groups = rule.value.api_groups
+      resources  = rule.value.resources
+      verbs      = rule.value.verbs
     }
   }
 }

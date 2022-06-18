@@ -26,7 +26,7 @@ variable "cluster_role" {
 variable "roles" {
   type = list(object({
     name  = string
-    rules = set(map(string))
+    rules = set(map(list(string)))
   }))
 
   description = "Configuration for the Roles"
