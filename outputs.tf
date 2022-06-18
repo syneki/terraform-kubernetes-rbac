@@ -1,10 +1,9 @@
-terraform {
-  required_version = ">= 0.13.1"
+output "service_account" {
+  value       = kubernetes_service_account.this.metadata[0].name
+  description = "The created ServiceAccount name"
+}
 
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.10"
-    }
-  }
+output "roles" {
+  value       = kubernetes_role.this[*].metadata.name
+  description = "The created Roles name"
 }
