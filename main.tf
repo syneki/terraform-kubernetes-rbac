@@ -17,9 +17,9 @@ resource "kubernetes_cluster_role" "this" {
     for_each = var.cluster_role.rules
 
     content {
-      api_groups        = rule.value.api_groups
-      resources         = rule.value.resources
-      non_resource_urls = rule.value.non_resource_urls
+      api_groups        = try(rule.value.api_groups, null)
+      resources         = try(rule.value.resources, null)
+      non_resource_urls = try(rule.value.non_resource_urls, null)
       verbs             = rule.value.verbs
     }
   }
@@ -44,7 +44,9 @@ resource "kubernetes_cluster_role_binding" "this" {
 }
 
 resource "kubernetes_role" "this" {
-  for_each = var.roles
+  for_each = {
+    for obj in var.roles : "${obj.name}" => obj
+  }
 
   metadata {
     name      = "${var.name}-${each.value.name}"
@@ -65,7 +67,7 @@ resource "kubernetes_role" "this" {
 
 resource "kubernetes_role_binding" "this" {
 
-  for_each = kubernetes_cluster_role.this
+  for_each = kubernetes_role.this
 
   metadata {
     name      = each.value.metadata[0].name

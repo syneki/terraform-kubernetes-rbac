@@ -60,7 +60,7 @@ module "rbac_example" {
       ]
     },
     {
-      name = "kubeadm-config" # The name will be rbac-example-kubeadm-config
+      name = "" # The name will be rbac-example-kubeadm-config
       rules = [
         {
           api_groups = ["coordination.k8s.io"]
