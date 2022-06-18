@@ -4,6 +4,6 @@ output "service_account" {
 }
 
 output "roles" {
-  value       = kubernetes_role.this[*].metadata.name
+  value       = kubernetes_role.this
   description = "The created Roles name"
 }
