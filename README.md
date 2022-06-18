@@ -235,7 +235,10 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_roles"></a> [roles](#output\_roles) | The created Roles name |
+| <a name="output_service_account"></a> [service\_account](#output\_service\_account) | The created ServiceAccount name |
 <!-- END_TF_DOCS -->
 
 output-values:
